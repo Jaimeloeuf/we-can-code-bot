@@ -1,0 +1,30 @@
+{
+  "name": "wecancode-bot-ts",
+  "version": "0.0.1",
+  "description": "Telegram Bot for we can code SG written in TS",
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "node ./build/index.js",
+    "dev": "npx nodemon ./build/index.js",
+    "build": "tsc ./src/index.ts --outDir ./build/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Enkel-Digital/we-can-code-bot.git"
+  },
+  "author": "JJ",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Enkel-Digital/we-can-code-bot/issues"
+  },
+  "homepage": "https://github.com/Enkel-Digital/we-can-code-bot#readme",
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.2",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "telegraf": "^3.36.0"
+  }
+}
