@@ -3,27 +3,60 @@ require("dotenv").config();
 const Telegraf = require("telegraf");
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
+// Get a list of allowed Group Chats for the bot to run in
+// @todo Get the list from DB
+const allowedGroupChats: string[] = ["wecancode bot test"];
+
 // Context object received by bot callback functions
 interface Ctx {
-  me: boolean;
+  from: any;
+  callbackQuery: any;
+  telegram: any;
+  message: string;
   chat: any;
   reply: (arg0: string) => any;
-  message: string;
 }
 
+// Set the bot's username for used in group chats
+bot.telegram.getMe().then((botInfo: any) => {
+  console.log("Setting username of bot to: ", botInfo.username);
+  bot.options.username = botInfo.username;
+});
+
 /**
- * Middleware to ensure bot is only running in the designated group chat
+ * Middleware to ensure message/event is from users and not other bots.
  */
-bot.use((ctx: Ctx, next: Function) => {
-  if (!(ctx.chat.type === "group" || ctx.chat.type === "supergroup")) {
-    return ctx.reply("Can only use this bot in group chat");
-  }
+bot.use(async function botChecker(ctx: Ctx, next: Function) {
+  try {
+    // Ignore if sender is another bot
+    if (ctx.from.is_bot) return;
 
-  if (ctx.chat.title !== "wecancode bot test") {
-    return ctx.reply("Invalid group");
+    return next();
+  } catch (error) {
+    console.error(error);
   }
+});
 
-  return next();
+/**
+ * Middleware to ensure bot is only running in group chats and only designated ones
+ */
+bot.use(async function inGroup(ctx: Ctx, next: Function) {
+  try {
+    if (!(ctx.chat.type === "group" || ctx.chat.type === "supergroup")) {
+      return ctx.reply("This bot is only usable in group chats");
+    }
+
+    if (allowedGroupChats.indexOf(ctx.chat.title) === -1) {
+      const errorMessage: string = `Bot is not allowed in this Group chat: "${ctx.chat.title}"`;
+      console.log(errorMessage);
+      await ctx.reply(errorMessage); // @todo This causes middleware to run again which errors out because bot alr left chat
+      return ctx.telegram.leaveChat(ctx.chat.id);
+    }
+
+    return next();
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 // What to do when a new member joins the chat group
