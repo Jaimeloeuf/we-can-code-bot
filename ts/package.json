@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node ./build/index.js",
     "dev": "npx nodemon ./build/index.js",
-    "build": "tsc ./src/index.ts --outDir ./build/",
+    "build:ts": "tsc ./src/index.ts --outDir ./build/",
+    "build:docker": "docker build -t wecancodesgbot -f ./.Dockerfile .",
+    "build": "npm run build:ts && npm run build:docker",
+    "deploy:firebase": "firebase deploy --only hosting",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,10 +24,12 @@
   "homepage": "https://github.com/Enkel-Digital/we-can-code-bot#readme",
   "devDependencies": {
     "dotenv": "^8.2.0",
+    "ngrok": "^3.2.7",
     "nodemon": "^2.0.2",
     "typescript": "^3.8.3"
   },
   "dependencies": {
+    "express": "^4.17.1",
     "telegraf": "^3.36.0"
   }
 }
