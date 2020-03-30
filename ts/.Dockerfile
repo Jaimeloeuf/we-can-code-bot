@@ -17,21 +17,16 @@ FROM node:10-alpine
 WORKDIR /app
 
 # Copy both package.json and package-lock.json in for installing dependencies with "npm ci"
-COPY package*.json ./
-
-# Install items and build tools needed to install the npm packages
-# RUN apk add --no-cache --virtual .gyp \
-#         python \
-#         make \
-#         g++ \
-#         git
+# COPY package*.json ./
+COPY package.json ./
+COPY package-lock.json ./
 
 # Install all production dependencies using lock file for a deterministic dependency installation
-# Delete .gyp files after installation
-RUN npm ci --only=production && apk del .gyp
+# RUN npm ci --only=production
+RUN npm install
 
 # Only copy the build file into current WORKDIR
-COPY ./build/* .
+COPY ./build/* ./build/
 
 # Define exposed ports, acting only as documentation. You STILL need to map the ports with -p option with docker run
 # EXPOSE 2090
@@ -39,5 +34,4 @@ COPY ./build/* .
 # ENTRYPOINT Command ensures this command runs when the container is spun up, and cannot be overwritten with shell arguements like CMD
 # Use shell form to get the shell to process/intepret the commands instead of calling the executable directly to use the ENV value
 # exec form does not have the shell's ability to intepret the workerNameENV, thus can't be used
-# ENTRYPOINT npm run start
-ENTRYPOINT ["npm" "run" "start"]
+ENTRYPOINT npm start
